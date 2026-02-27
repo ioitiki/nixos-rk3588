@@ -4,9 +4,13 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixos-rk3588.url = "github:ioitiki/nixos-rk3588";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, nixos-rk3588, ... }:
+  outputs = { nixpkgs, nixos-rk3588, home-manager, ... }:
     let
       system = "aarch64-linux";
       pkgsNative = import nixpkgs { inherit system; };
@@ -21,6 +25,12 @@
         nixos-rk3588.nixosModules.boards.orangepi5.core
         ./hardware-configuration.nix
         ./configuration.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.andy = import ./home.nix;
+        }
       ];
     };
   };
